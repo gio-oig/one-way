@@ -1,0 +1,74 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  name      String?
+  email     String   @unique
+  password  String
+  phone     String?
+  Post      Post[]
+
+  @@map("users")
+}
+
+model City {
+  id               Int                @id @default(autoincrement())
+  region           Region             @relation(fields: [regionId], references: [id])
+  regionId         Int
+  CityTranslations CityTranslations[]
+  originCity       Post[]             @relation("origin")
+  destionationCity Post[]             @relation("destionation")
+
+  @@map("cities")
+}
+
+model CityTranslations {
+  id           Int    @id @default(autoincrement())
+  languageCode String
+  name         String
+  city         City   @relation(fields: [cityId], references: [id])
+  cityId       Int
+
+  @@map("cityTranslations")
+}
+
+model Post {
+  id                Int      @id @default(autoincrement())
+  author            User     @relation(fields: [authorId], references: [id])
+  authorId          Int
+  numberOfPeople    Int
+  moveOutDate       DateTime
+  originCity        City     @relation("origin", fields: [originCityId], references: [id])
+  originCityId      Int
+  destinationCity   City     @relation("destionation", fields: [destinationCityId], references: [id])
+  destinationCityId Int
+}
+
+model Region {
+  id                 Int                  @id @default(autoincrement())
+  City               City[]
+  RegionTranslations RegionTranslations[]
+
+  @@map("regions")
+}
+
+model RegionTranslations {
+  id           Int    @id @default(autoincrement())
+  languageCode String
+  name         String
+  Region       Region @relation(fields: [regionId], references: [id])
+  regionId     Int
+
+  @@map("regionTranslations")
+}
