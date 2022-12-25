@@ -1,4 +1,4 @@
-import { User } from "@prisma/client";
+import { User, PostType, CityTranslations, City } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export interface JwtBody {
@@ -10,3 +10,22 @@ export type NextHandler = (
   res: NextApiResponse,
   user: User
 ) => Promise<void>;
+
+export interface IPost {
+  id: number;
+  author: User;
+  description: string;
+  originCity: City & {
+    cityTranslations: CityTranslations[];
+  };
+  destinationCity: City & {
+    cityTranslations: CityTranslations[];
+  };
+  numberOfPeople: number;
+  moveOutDate: string;
+  type: PostType;
+}
+
+export type ICity = City & {
+  name: string;
+};

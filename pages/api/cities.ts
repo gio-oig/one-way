@@ -5,19 +5,12 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const senakiCity = await prisma.city.findMany({
-    // where: {},
+  const cities = await prisma.city.findMany({
     include: {
-      region: {
-        include: {
-          RegionTranslations: {
-            select: {
-              name: true,
-            },
-          },
+      cityTranslations: {
+        where: {
+          languageCode: "ge",
         },
-      },
-      CityTranslations: {
         select: {
           name: true,
         },
@@ -25,5 +18,14 @@ export default async function handler(
     },
   });
 
-  return res.json({ data: senakiCity });
+  const formatedCities = cities.map((city) => {
+    const { id, regionId, cityTranslations } = city;
+    return {
+      id,
+      regionId,
+      name: cityTranslations[0].name,
+    };
+  });
+
+  return res.json(formatedCities);
 }
