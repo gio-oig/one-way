@@ -1,24 +1,34 @@
-import { validateRoute } from "../../../lib/auth";
+import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "../../../lib/prisma";
 
-export default validateRoute(async (req, res, user) => {
-  const { numberOfPeople, originCityId, destinationCityId, moveOutDate } =
-    req.body;
-
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   try {
-    const newPost = await prisma.post.create({
-      data: {
-        authorId: user.id,
-        moveOutDate,
-        numberOfPeople,
-        destinationCityId,
-        originCityId,
+    const posts = await prisma.post.findMany({
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            phone: true,
+          },
+        },
+        destinationCity: {
+          include: {
+            cityTranslations: true,
+          },
+        },
+        originCity: {
+          include: {
+            cityTranslations: true,
+          },
+        },
       },
     });
-
-    return res.json({ message: "post has been created", data: newPost });
+    res.json(posts);
   } catch (error) {
-    console.log(error, "error");
-    return res.status(401).json({ message: "could not create post" });
+    res.status(401).json({ message: "could not fetch posts" });
   }
-});
+}
