@@ -18,3 +18,17 @@ a {
 * {
   box-sizing: border-box;
 }
+
+.truncated-text {
+  overflow: hidden;
+  height: 60px; /* initial height */
+  transition: height 1s ease; /* transition duration and easing */
+}
+
+.not-truncated-text {
+  height: auto;
+}
+
+input {
+  outline: none;
+}

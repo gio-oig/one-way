@@ -1,21 +1,19 @@
-import { PrismaClient } from "@prisma/client";
+import prisma from "lib/prisma";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 type Data = {
   data: any;
 };
 
-const prisma = new PrismaClient();
-
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Data>
+  res: NextApiResponse
 ) {
   const regions = await prisma.region.findMany({
     include: {
       City: {
         include: {
-          CityTranslations: true,
+          cityTranslations: true,
         },
       },
       RegionTranslations: {
@@ -31,5 +29,5 @@ export default async function handler(
     name: region.RegionTranslations[0].name,
   }));
 
-  res.status(200).json({ data: regions });
+  res.status(200).json(mapped);
 }

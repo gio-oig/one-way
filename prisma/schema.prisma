@@ -26,7 +26,7 @@ model City {
   id               Int                @id @default(autoincrement())
   region           Region             @relation(fields: [regionId], references: [id])
   regionId         Int
-  CityTranslations CityTranslations[]
+  cityTranslations CityTranslations[]
   originCity       Post[]             @relation("origin")
   destionationCity Post[]             @relation("destionation")
 
@@ -48,11 +48,13 @@ model Post {
   author            User     @relation(fields: [authorId], references: [id])
   authorId          Int
   numberOfPeople    Int
+  description       String?
   moveOutDate       DateTime
   originCity        City     @relation("origin", fields: [originCityId], references: [id])
   originCityId      Int
   destinationCity   City     @relation("destionation", fields: [destinationCityId], references: [id])
   destinationCityId Int
+  type              PostType
 }
 
 model Region {
@@ -71,4 +73,9 @@ model RegionTranslations {
   regionId     Int
 
   @@map("regionTranslations")
+}
+
+enum PostType {
+  FOLLOWER
+  DRIVER
 }

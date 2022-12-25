@@ -1,18 +1,19 @@
-import { PrismaClient } from "@prisma/client";
+import { PostType, PrismaClient } from "@prisma/client";
 import { Location, regionsWithCities } from "./locationsData";
 import bcrypt from "bcrypt";
+import { getRandomitem } from "./helperFunctions";
 
 const prisma = new PrismaClient();
 
-const regions = [
-  "სამეგრელო",
-  "აჭარა",
-  "გურია",
-  "აფხაზეთი",
-  "სვანეთი",
-  "იმერეთი",
-];
-const cities = ["სენაკი", "ფოთი", "ბათუმი", "ქობულეთი"];
+// const regions = [
+//   "სამეგრელო",
+//   "აჭარა",
+//   "გურია",
+//   "აფხაზეთი",
+//   "სვანეთი",
+//   "იმერეთი",
+// ];
+// const cities = ["სენაკი", "ფოთი", "ბათუმი", "ქობულეთი"];
 
 const createRegions = async (region: string) => {
   return await prisma.region.create({
@@ -43,7 +44,7 @@ const createCities = async (locationsData: Location[]) => {
     for (let city of location.cities) {
       await prisma.city.create({
         data: {
-          CityTranslations: {
+          cityTranslations: {
             create: {
               languageCode: "ge",
               name: city,
@@ -77,33 +78,23 @@ const run = async () => {
   createCities(regionsWithCities);
   const user = await createUser("user@test.com", "password");
 
-  const senakiCity = await prisma.city.findFirst({
+  const cities = await prisma.city.findMany({
     include: {
-      CityTranslations: {
-        where: {
-          name: "სენაკი",
-        },
-      },
-    },
-  });
-  const potiCity = await prisma.city.findFirst({
-    include: {
-      CityTranslations: {
-        where: {
-          name: "ფოთი",
-        },
-      },
+      cityTranslations: true,
     },
   });
 
-  if (senakiCity && potiCity) {
+  for (let city of cities) {
+    const destinationCity = getRandomitem(cities);
+
     await prisma.post.create({
       data: {
-        authorId: user.id,
-        originCityId: senakiCity.id,
-        destinationCityId: potiCity.id,
-        numberOfPeople: 3,
+        authorId: 1,
+        originCityId: city.id,
+        destinationCityId: destinationCity.id,
+        numberOfPeople: Math.floor(Math.random() * 10) || 2,
         moveOutDate: new Date(),
+        type: Math.random() > 0.5 ? PostType.DRIVER : PostType.FOLLOWER,
       },
     });
   }
