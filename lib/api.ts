@@ -1,5 +1,6 @@
 import axios from "axios";
-import { ICity, IPost } from "types";
+import { ICity, IPost, NewPost } from "types";
+import axiosInst from "lib/axios";
 
 type NewUser = {
   name: string;
@@ -36,6 +37,11 @@ export const fetchPosts = async () => {
 export const fetchCities = async () => {
   const res = await axios.get<ICity[]>("http://localhost:3000/api/post");
   return res.data;
+};
+
+export const createPost = async (newPost: NewPost) => {
+  const res = await axiosInst.post("/api/post/create", newPost);
+  console.log(res);
 };
 
 export const fetcher = (url: string) => axios.get(url).then((res) => res.data);

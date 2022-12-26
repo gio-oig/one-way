@@ -32,7 +32,7 @@ export const validateRoute = (handler: NextHandler) => {
       return handler(req, res, user);
     }
 
-    return res.status(401).json({ error: "Not Authorized" });
+    return res.status(401).json({ error: "Could Not Find Token" });
   };
 };
 
@@ -50,7 +50,7 @@ export function getToken(id: number) {
   const secret = getEnv("JWTSECRET");
 
   const TOKEN = jwt.sign({ id }, secret, {
-    expiresIn: "1h",
+    // expiresIn: "1h",
   });
 
   return TOKEN;

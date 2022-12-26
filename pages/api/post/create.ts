@@ -3,8 +3,13 @@ import { validateRoute } from "lib/auth";
 import prisma from "lib/prisma";
 
 export default validateRoute(async (req, res, user) => {
-  const { numberOfPeople, originCityId, destinationCityId, moveOutDate } =
-    req.body;
+  const {
+    numberOfPeople,
+    originCityId,
+    destinationCityId,
+    moveOutDate,
+    description,
+  } = req.body;
 
   try {
     const newPost = await prisma.post.create({
@@ -13,6 +18,7 @@ export default validateRoute(async (req, res, user) => {
         moveOutDate,
         numberOfPeople,
         destinationCityId,
+        description,
         originCityId,
         type: PostType.DRIVER,
       },

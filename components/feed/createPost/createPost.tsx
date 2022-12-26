@@ -1,29 +1,40 @@
 "use client";
-import { fetcher } from "lib/api";
+import { createPost, fetcher } from "lib/api";
 import { ComponentProps, useState, ReactNode } from "react";
 import useSWR from "swr";
-import { ICity } from "types";
+import { ICity, NewPost } from "types";
 import DatePicker from "react-datepicker";
 import { useFormik } from "formik";
 
 import "react-datepicker/dist/react-datepicker.css";
+import { useRouter } from "next/navigation";
 
-const initialValues = {
-  originCity: "",
-  destinationCity: "",
-  numberOfPeople: "",
-  date: null,
+const initialValues: NewPost = {
+  originCityId: "",
+  destinationCityId: "",
+  numberOfPeople: 0,
+  moveOutDate: null,
   description: "",
 };
 
 const CreatePost = () => {
+  const router = useRouter();
   const { data, error } = useSWR<ICity[]>("/api/cities", fetcher);
+  // const { data, mutate } = useSWR('/api/user', fetcher)
   const [selectedCity, setSelectedCity] = useState<number[]>([]);
 
   const formik = useFormik({
     initialValues,
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
       console.log(values);
+
+      await createPost({
+        ...values,
+        originCityId: +values.originCityId,
+        destinationCityId: +values.destinationCityId,
+      });
+
+      router.refresh();
     },
   });
 
@@ -31,19 +42,19 @@ const CreatePost = () => {
     <div className="rounded-lg px-6 py-4 shadow-md">
       <form onSubmit={formik.handleSubmit}>
         <div className="flex">
-          <select className="" name="originCity" onChange={formik.handleChange}>
+          <select name="originCityId" onChange={formik.handleChange}>
             <option value="" hidden></option>
             {data?.map((city) => (
-              <option key={city.id} value={city.name}>
+              <option key={city.id} value={city.id}>
                 {city.name}
               </option>
             ))}
           </select>
-          <select name="destinationCity" onChange={formik.handleChange}>
+          <select name="destinationCityId" onChange={formik.handleChange}>
             <option value="" hidden></option>
 
             {data?.map((city) => (
-              <option key={city.id} value={city.name}>
+              <option key={city.id} value={city.id}>
                 {city.name}
               </option>
             ))}
@@ -74,15 +85,15 @@ const CreatePost = () => {
           ></textarea>
         </div>
         <div>
-          <Label htmlFor="date" text="pick a trip date" />
+          <Label htmlFor="moveOutDate" text="pick a trip date" />
           <DatePicker
             className="rounded border"
             minDate={new Date()}
-            selected={formik.values.date}
-            onChange={(date: Date) => formik.setFieldValue("date", date)}
+            selected={formik.values.moveOutDate}
+            onChange={(date: Date) => formik.setFieldValue("moveOutDate", date)}
           />
         </div>
-        <button className="border px-3 py-2 text-sm">create post</button>
+        <button className="mt-3 border px-3 py-2 text-sm">create post</button>
       </form>
     </div>
   );

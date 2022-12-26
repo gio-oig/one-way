@@ -29,3 +29,11 @@ export interface IPost {
 export type ICity = City & {
   name: string;
 };
+
+export type NewPost = {
+  originCityId: number | string;
+  destinationCityId: number | string;
+  numberOfPeople: number;
+  moveOutDate: Date | null;
+  description: string;
+};
