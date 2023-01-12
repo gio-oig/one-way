@@ -26,9 +26,13 @@ export default async function handler(
           },
         },
       },
+      orderBy: {
+        updatedAt: "desc",
+      },
     });
     res.json(posts);
   } catch (error) {
+    console.log(error);
     res.status(401).json({ message: "could not fetch posts" });
   }
 }

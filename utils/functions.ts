@@ -7,3 +7,13 @@ export const getAuthLayoutTitle = (pathName: string | null) => {
 export const getToken = () => {
   return localStorage.getItem("TOKEN");
 };
+
+export const calculateLeftDays = (dateString: string) => {
+  const millisecondsInADay = 86400000;
+  const targetDate = new Date(Date.parse(dateString));
+  const currentDate = new Date();
+  const timeDiff = targetDate.getTime() - currentDate.getTime();
+  const daysLeft = Math.floor(timeDiff / millisecondsInADay);
+
+  return daysLeft;
+};

@@ -36,4 +36,10 @@ export type NewPost = {
   numberOfPeople: number;
   moveOutDate: Date | null;
   description: string;
+  phone: string;
+  postType: PostType;
+};
+
+export type NewPostForm = Omit<NewPost, "postType"> & {
+  postType: PostType | string;
 };

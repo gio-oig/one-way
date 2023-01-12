@@ -2,6 +2,7 @@
 
 import React, { useMemo, useState } from "react";
 import { IPost } from "types";
+import { calculateLeftDays } from "utils/functions";
 
 type PostProps = {
   post: IPost;
@@ -52,7 +53,8 @@ const Post = ({ post }: PostProps) => {
             <i className="far fa-users" /> {numberOfPeople} people
           </p>
           <p className="mb-2 text-xs text-gray-600">
-            <i className="far fa-calendar-alt" /> {moveOutDate}
+            <i className="far fa-calendar-alt" /> in{" "}
+            {calculateLeftDays(moveOutDate)} days
           </p>
         </div>
       </div>

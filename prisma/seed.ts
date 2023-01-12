@@ -2,6 +2,7 @@ import { PostType, PrismaClient } from "@prisma/client";
 import { Location, regionsWithCities } from "./locationsData";
 import bcrypt from "bcrypt";
 import { getRandomitem } from "./helperFunctions";
+import { postDescriptions } from "./seedData";
 
 const prisma = new PrismaClient();
 
@@ -75,14 +76,15 @@ async function createUser(email: string, password: string) {
 
 const run = async () => {
   // await Promise.all(regions.map(createRegions));
-  createCities(regionsWithCities);
-  const user = await createUser("user@test.com", "password");
+  // await createCities(regionsWithCities);
+  // const user = await createUser("user@test.com", "password");
 
   const cities = await prisma.city.findMany({
     include: {
       cityTranslations: true,
     },
   });
+  console.log(cities);
 
   for (let city of cities) {
     const destinationCity = getRandomitem(cities);
@@ -92,9 +94,11 @@ const run = async () => {
         authorId: 1,
         originCityId: city.id,
         destinationCityId: destinationCity.id,
+        description: getRandomitem(postDescriptions),
         numberOfPeople: Math.floor(Math.random() * 10) || 2,
         moveOutDate: new Date(),
         type: Math.random() > 0.5 ? PostType.DRIVER : PostType.FOLLOWER,
+        phone: "557 44 11 90",
       },
     });
   }
