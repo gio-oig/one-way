@@ -24,6 +24,7 @@ export interface IPost {
   numberOfPeople: number;
   moveOutDate: string;
   type: PostType;
+  phone: string;
 }
 
 export type ICity = City & {

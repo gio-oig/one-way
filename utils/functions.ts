@@ -17,3 +17,13 @@ export const calculateLeftDays = (dateString: string) => {
 
   return daysLeft;
 };
+
+export const createQueryString = (filters: Record<string, any>) => {
+  let queryString = "";
+  for (const key in filters) {
+    if (filters[key] !== null && filters[key] !== "") {
+      queryString += `${key}=${filters[key]}&`;
+    }
+  }
+  return queryString.slice(0, -1);
+};

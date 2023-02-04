@@ -17,6 +17,7 @@ const Post = ({ post }: PostProps) => {
     originCity,
     moveOutDate,
     type,
+    phone,
   } = post;
   const [isTruncated, setIsTruncated] = useState(true);
   const [textHeight, setTextHeight] = useState("60px");
@@ -48,6 +49,7 @@ const Post = ({ post }: PostProps) => {
           {description}
         </div>
         <button onClick={toggleTruncation}>show more</button>
+        <p className="mb-2 text-xs text-gray-600">{phone}</p>
         <div className="flex items-center justify-between">
           <p className="mb-2 text-xs text-gray-600">
             <i className="far fa-users" /> {numberOfPeople} people

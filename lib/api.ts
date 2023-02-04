@@ -44,4 +44,13 @@ export const createPost = async (newPost: NewPost) => {
   console.log(res);
 };
 
-export const fetcher = (url: string) => axios.get(url).then((res) => res.data);
+export const filterPosts = async (filters: any) => {
+  const res = await axiosInst.post("/api/post", filters);
+  return res.data;
+};
+
+export const fetcher = (url: string, data: any = {}) =>
+  axios.get(url, data).then((res) => res.data);
+
+export const sender = (url: string, data: any) =>
+  axios.post(url, data).then((res) => res.data);

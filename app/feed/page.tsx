@@ -1,36 +1,44 @@
 "use client";
 import Button from "@components/common/button/button";
+import SelectButton from "@components/common/selectButton/selectButton";
 import CreatePost from "@components/feed/createPost/createPost";
 import Post from "@components/feed/post";
-import { fetcher } from "lib/api";
-import { useFilteresStore } from "store/feedFilter";
-import useSWR from "swr";
-import { IPost } from "types";
+import { useEffect, useState } from "react";
+import FilterPosts from "@components/feed/filterPosts/filterPosts";
+import useFeed from "@components/feed/hooks/useFeed";
+
+const tabComponents = {
+  "create post": <CreatePost />,
+  filter: <FilterPosts />,
+};
 
 export default function Page() {
-  const { data: posts, isLoading } = useSWR<IPost[]>("/api/post", fetcher);
-  const { filters } = useFilteresStore();
+  // const { data: posts, isLoading } = useSWR<IPost[]>("/api/post", fetcher);
+  const { isLoading, posts } = useFeed();
+  const [selectedTab, setSelectedTab] = useState<
+    keyof typeof tabComponents | ""
+  >("");
 
-  const filteredFeed = posts?.filter((post) => {
-    if (filters.postType && post.type !== filters.postType) {
-      return false;
-    }
-
-    return true;
-  });
+  const TabComponent = selectedTab ? tabComponents[selectedTab] : <></>;
 
   return (
     <main className="">
       <div className="mx-auto max-w-sm">
-        <CreatePost />
-        {/* <div className="flex justify-around">
-          <Button className="border">Create new Post</Button>
-          <Button className="border">Filter posts</Button>
-        </div> */}
-        {isLoading || !filteredFeed ? (
+        <div className="flex gap-x-2">
+          {Object.keys(tabComponents).map((item, i) => (
+            <SelectButton
+              key={i}
+              value={item}
+              onClick={() => setSelectedTab(item as keyof typeof tabComponents)}
+            />
+          ))}
+        </div>
+        {/* <CreatePost /> */}
+        {TabComponent}
+        {isLoading || !posts ? (
           <div>loading posts...</div>
         ) : (
-          filteredFeed.map((post, i) => <Post key={i} post={post} />)
+          posts.map((post, i) => <Post key={i} post={post} />)
         )}
       </div>
     </main>

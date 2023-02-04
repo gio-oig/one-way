@@ -9,6 +9,7 @@ export default validateRoute(async (req, res, user) => {
     destinationCityId,
     moveOutDate,
     description,
+    phone,
   } = req.body;
 
   try {
@@ -20,6 +21,7 @@ export default validateRoute(async (req, res, user) => {
         destinationCityId,
         description,
         originCityId,
+        phone: String(phone),
         type: PostType.DRIVER,
       },
     });

@@ -1,45 +1,53 @@
 "use client";
-import { createPost, fetcher } from "lib/api";
+import { createPost, fetcher, filterPosts, sender } from "lib/api";
 import { ComponentProps, useState, ReactNode } from "react";
 import useSWR, { useSWRConfig } from "swr";
+import useSWRMutation from "swr/mutation";
 import { ICity, NewPost, NewPostForm } from "types";
 import DatePicker from "react-datepicker";
 import { useFormik } from "formik";
 import { PostType } from "@prisma/client";
-import { CreatePostSchema } from "utils/validationSchemas/post";
 
 import "react-datepicker/dist/react-datepicker.css";
+import useFeed from "../hooks/useFeed";
+import { useFilteresStore } from "store/feedFilter";
 
-const initialValues: NewPostForm = {
+type FilterPostForm = {
+  originCityId: string;
+  destinationCityId: string;
+  numberOfPeople: string;
+  moveOutDate: Date | null;
+  postType: PostType | "";
+};
+
+const initialValues: FilterPostForm = {
   originCityId: "",
   destinationCityId: "",
-  numberOfPeople: 0,
+  numberOfPeople: "",
   moveOutDate: null,
-  description: "",
-  phone: "",
   postType: "",
 };
 
-const CreatePost = () => {
+const FilterPosts = () => {
   const { data, error } = useSWR<ICity[]>("/api/cities", fetcher);
   const { mutate } = useSWRConfig();
+  // const { mutate } = useFeed();
+  const { setFilters } = useFilteresStore();
+
   const [selectedCity, setSelectedCity] = useState<number[]>([]);
 
   const formik = useFormik({
     initialValues,
-    validateOnBlur: false,
-    validateOnChange: false,
-    validationSchema: CreatePostSchema,
-    onSubmit: async (values) => {
-      let newPostData = values as NewPost;
+    onSubmit: (values) => {
+      console.log(values);
 
-      await createPost({
-        ...newPostData,
-        originCityId: +values.originCityId,
-        destinationCityId: +values.destinationCityId,
+      setFilters({
+        destinationCityId: values.destinationCityId,
+        numberOfPeople: values.numberOfPeople,
+        originCityId: values.originCityId,
+        postType: values.postType as PostType,
+        moveOutDate: values.moveOutDate?.toISOString() || null,
       });
-
-      mutate("/api/post");
     },
   });
   console.log(formik.errors);
@@ -79,41 +87,16 @@ const CreatePost = () => {
             value={formik.values.numberOfPeople}
             onChange={formik.handleChange}
           />
-          {formik.errors.numberOfPeople && formik.errors.numberOfPeople}
-        </div>
-        <div>
-          <Label htmlFor="description" text="Description" />
-          <textarea
-            name="description"
-            value={formik.values.description}
-            onChange={formik.handleChange}
-            className="w-full resize-none rounded-md border outline-none"
-          ></textarea>
-        </div>
-        <div>
-          <Label
-            htmlFor="phone"
-            text="Phone"
-            className="block text-xs font-medium text-gray-700"
-          />
-          <input
-            className="w-full rounded border sm:text-sm"
-            type="number"
-            name="phone"
-            value={formik.values.phone}
-            onChange={formik.handleChange}
-          />
-          {formik.errors.phone && formik.errors.phone}
         </div>
         <div>
           <Label htmlFor="moveOutDate" text="pick a trip date" />
           <DatePicker
             className="rounded border"
             minDate={new Date()}
+            name="moveOutDate"
             selected={formik.values.moveOutDate}
             onChange={(date: Date) => formik.setFieldValue("moveOutDate", date)}
           />
-          {formik.errors.moveOutDate && formik.errors.moveOutDate}
         </div>
         <div>
           <Label
@@ -139,15 +122,25 @@ const CreatePost = () => {
               onChange={formik.handleChange}
             />
           </Label>
-          {formik.errors.postType && formik.errors.postType}
         </div>
-        <button className="mt-3 border px-3 py-2 text-sm">create post</button>
+        <div className="mt-3 flex items-end justify-between">
+          <button className=" border px-3 py-2 text-sm">filter</button>
+          <p
+            className="cursor-pointer text-gray-500"
+            onClick={(e) => {
+              e.preventDefault();
+              formik.resetForm();
+            }}
+          >
+            clear filter
+          </p>
+        </div>
       </form>
     </div>
   );
 };
 
-export default CreatePost;
+export default FilterPosts;
 
 type LabelProps = {
   text: ReactNode;
